@@ -1,12 +1,15 @@
+require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const session = require('express-session');
+const ejs = require('ejs');
+const path = require('path');
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
-
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({
   secret: 'your-secret-key',
   resave: false,
@@ -33,7 +36,6 @@ function (email, password, done) {
 }
 ));
 
-
 passport.serializeUser(function (user, done) {
   done(null, user.email);
 });
@@ -47,7 +49,7 @@ passport.deserializeUser(function (email, done) {
   }
 });
 
-function ensureAuthenticated(req, res, next) {
+function isAuthenticated(req, res, next) {
   if (req.isAuthenticated()) {
     return next();
   } else {
@@ -55,21 +57,37 @@ function ensureAuthenticated(req, res, next) {
   }
 }
 
-app.get('/', (req, res) => {
-  res.render('welcome');
-});
+function renderWithLayout(view, options = {}) {
+  return async (req, res, next) => {
+    try {
+      const renderOptions = {
+        ...options,
+        user: req.user
+      };
+      const content = await ejs.renderFile(`views/${view}.ejs`, renderOptions);
+      res.render('layout', {
+        title: options.title || 'Untitled',
+        content: content,
+        castlePublishableKey: process.env.CASTLE_PUBLISHABLE_KEY,
+      });
+    } catch (err) {
+      next(err);
+    }
+  };
+}
 
-app.get('/login', (req, res) => {
-  res.render('login');
-});
+app.get('/', renderWithLayout('index', { title: 'Welcome' }));
+
+app.get('/login', renderWithLayout('login', { title: 'Log in' }));
 
 app.post('/login', (req, res, next) => {
-  passport.authenticate('local', (err, user, info) => {
+  passport.authenticate('local', async (err, user, info) => {
     if (err) {
       return next(err);
     }
     if (!user) {
-      return res.render('login', { errorMessage: info.message });
+      const renderLoginWithError = (errorMessage) => renderWithLayout('login', { title: 'Log in', errorMessage });
+      return await renderLoginWithError(info.message)(req, res, next);
     }
     req.logIn(user, (err) => {
       if (err) {
@@ -80,15 +98,15 @@ app.post('/login', (req, res, next) => {
   })(req, res, next);
 });
 
-app.get('/signup', (req, res) => {
-  res.render('signup');
-});
 
-app.post('/signup', (req, res) => {
+app.get('/signup', renderWithLayout('signup', { title: 'Sign up' }));
+
+app.post('/signup', async (req, res) => {
   const existingUser = users.find(u => u.email === req.body.email);
 
   if (existingUser) {
-    return res.render('signup', { errorMessage: 'Email is already in use.' });
+    const renderSignupWithError = (errorMessage) => renderWithLayout('signup', { title: 'Sign up', errorMessage });
+    return await renderSignupWithError('Email is already in use.')(req, res);
   }
 
   users.push({
@@ -99,9 +117,7 @@ app.post('/signup', (req, res) => {
   res.redirect('/login');
 });
 
-app.get('/dashboard', ensureAuthenticated, (req, res) => {
-  res.render('dashboard', { user: req.user });
-});
+app.get('/dashboard', isAuthenticated, renderWithLayout('dashboard', { title: 'Dashboard' }));
 
 app.get('/logout', (req, res) => {
   req.session.destroy(err => {
