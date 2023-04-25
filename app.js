@@ -6,6 +6,7 @@ const LocalStrategy = require('passport-local').Strategy;
 const session = require('express-session');
 const ejs = require('ejs');
 const path = require('path');
+const axios = require('axios')
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -85,6 +86,38 @@ app.post('/login', (req, res, next) => {
     if (err) {
       return next(err);
     }
+
+    const requestToken = req.body.request_token
+    console.log(requestToken)
+
+    const ip = req.get('x-forwarded-for') || req.connection.remoteAddress;
+    if (ip.indexOf(',') > -1) {
+      ip = ip.split(',')[0];
+    }
+
+    let headers = JSON.parse(JSON.stringify(req.headers));
+    delete headers['cookie'];
+
+    const payload = {
+      type: "$login",
+      status: "$succeeded",
+      user: {
+        id: "887",
+        email: req.body.email
+      },
+      context: {
+        ip: ip,
+        headers: headers
+      },
+      request_token: requestToken
+    }
+
+    const endpoint = '/v1/risk'
+
+    await axios.post('https://api.castle.io' + endpoint,
+      payload, { auth: { password: process.env.CASTLE_API_SECRET, username: '' } }
+    )
+
     if (!user) {
       const renderLoginWithError = (errorMessage) => renderWithLayout('login', { title: 'Log in', errorMessage });
       return await renderLoginWithError(info.message)(req, res, next);

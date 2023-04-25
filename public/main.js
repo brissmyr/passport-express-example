@@ -26,7 +26,18 @@ eval("(function(n,r){ true?r(exports):0})(this,function(n){var _=[\"Onpxfcnpr\",
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _castleio_castle_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @castleio/castle-js */ \"./node_modules/@castleio/castle-js/dist/castle.js\");\n/* harmony import */ var _castleio_castle_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_castleio_castle_js__WEBPACK_IMPORTED_MODULE_0__);\n\nvar castle = _castleio_castle_js__WEBPACK_IMPORTED_MODULE_0__.configure({\n  pk: window.castlePublishableKey\n});\ncastle.createRequestToken().then(function (requestToken) {\n  console.log(requestToken);\n});\n\n//# sourceURL=webpack://passport-express-example/./src/index.js?");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _style_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./style.css */ \"./src/style.css\");\n/* harmony import */ var _castleio_castle_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @castleio/castle-js */ \"./node_modules/@castleio/castle-js/dist/castle.js\");\n/* harmony import */ var _castleio_castle_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_castleio_castle_js__WEBPACK_IMPORTED_MODULE_1__);\n\n\nvar castle = _castleio_castle_js__WEBPACK_IMPORTED_MODULE_1__.configure({\n  pk: window.castlePublishableKey\n});\ncastle.createRequestToken().then(function (requestToken) {\n  console.log(requestToken);\n});\n\n// Note: It's recommended that you use the form submit helper if you can\nvar myForm = document.getElementsByTagName('form')[0];\nmyForm.addEventListener('submit', function (e) {\n  e.preventDefault();\n\n  // get or insert a hidden field with the Castle request token\n  var hiddenField;\n  for (var i = 0; i < myForm.childNodes.length; i++) {\n    var node = myForm.childNodes[i];\n    if (node.getAttribute && node.getAttribute('name') === 'castle_request_token') {\n      hiddenField = node;\n      break;\n    }\n  }\n  if (!hiddenField) {\n    hiddenField = document.createElement('input');\n    hiddenField.setAttribute('type', 'hidden');\n    hiddenField.setAttribute('name', 'request_token');\n    myForm.appendChild(hiddenField);\n  }\n  castle.createRequestToken().then(function (token) {\n    hiddenField.value = token;\n    myForm.submit();\n  });\n  return false;\n});\n\n//# sourceURL=webpack://passport-express-example/./src/index.js?");
+
+/***/ }),
+
+/***/ "./src/style.css":
+/*!***********************!*\
+  !*** ./src/style.css ***!
+  \***********************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n// extracted by mini-css-extract-plugin\n\n\n//# sourceURL=webpack://passport-express-example/./src/style.css?");
 
 /***/ })
 
