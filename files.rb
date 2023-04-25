@@ -6,7 +6,7 @@ puts "Here is a list of all the files in a project called Auth."
 puts "----- Files start below this point -----"
 
 exclude_files = ['.env', 'main.js', '.DS_Store', 'Gemfile.lock', 'package.json', 'package-lock.json', '.gitignore', 'files.rb', '*.md', '*.txt', '*.md', '*.sh', 'plugins.db']
-exclude_dirs = ['.git', '.DS_Store', 'node_modules']
+exclude_dirs = ['.git', '.DS_Store', 'node_modules', 'public']
 
 def print_file_contents(file_path)
   puts "----- #{file_path} -----"
