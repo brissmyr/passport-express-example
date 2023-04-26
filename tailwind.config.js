@@ -1,13 +1,8 @@
-/** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: [
-    "./src/**/*.{html,js}"
-  ],
+  content: ["./src/**/*.{html,js}"],
   purge: {
     content: ['./views/**/*.ejs', './src/**/*.js'],
-    options: {
-      safelist: [],
-    },
+    options: { safelist: [] },
   },
   theme: {
     extend: {
@@ -16,7 +11,5 @@ module.exports = {
       },
     },
   },
-  plugins: [
-    require('@tailwindcss/forms'),
-  ],
-}
+  plugins: [require('@tailwindcss/forms')],
+};
