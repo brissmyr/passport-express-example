@@ -6,7 +6,7 @@
   "scripts": {
     "build": "webpack --mode production",
     "start": "node app.js",
-    "dev": "TAILWIND_MODE=watch webpack --mode development",
+    "dev": "concurrently \"TAILWIND_MODE=watch webpack --mode development --watch\" \"nodemon --watch './views/*.ejs' --ext 'ejs' app.js\"",
     "build:css": "tailwindcss build src/style.css -o public/css/main.css"
   },
   "keywords": [],
@@ -30,8 +30,10 @@
     "@tailwindcss/forms": "^0.5.3",
     "autoprefixer": "^10.4.14",
     "babel-loader": "^9.1.2",
+    "concurrently": "^8.0.1",
     "css-loader": "^6.7.3",
     "html-webpack-plugin": "^5.5.1",
+    "nodemon": "^2.0.22",
     "postcss": "^8.4.23",
     "postcss-loader": "^7.2.4",
     "postcss-preset-env": "^8.3.2",

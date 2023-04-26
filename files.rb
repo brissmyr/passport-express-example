@@ -5,8 +5,8 @@ puts "You are a seasoned software developer and architect."
 puts "Here is a list of all the files in a project called Auth."
 puts "----- Files start below this point -----"
 
-exclude_files = ['.env', 'main.js', '.DS_Store', 'Gemfile.lock', 'package.json', 'package-lock.json', '.gitignore', 'files.rb', '*.md', '*.txt', '*.md', '*.sh', 'plugins.db']
-redact_files = ['*.ejs']
+exclude_files = ['.env', 'main.js', '.DS_Store', 'Gemfile.lock', 'package-lock.json', '.gitignore', 'files.rb', '*.md', '*.txt', '*.md', '*.sh', 'plugins.db']
+redact_files = ['*.ejs', 'package.json']
 exclude_dirs = ['.git', '.DS_Store', 'node_modules', 'public']
 
 def print_file_contents(file_path)
