@@ -89,25 +89,41 @@ app.post('/login', (req, res, next) => {
       return next(err);
     }
 
-    const userPayload = {
-      type: "$login",
-      status: "$succeeded",
-      user: {
-        id: "887",
-        email: req.body.email,
-      },
-    };
-
-    await castleApiHelper.getRequestDataAndSendLoginEvent(req, userPayload);
-
     if (!user) {
+      await castleApiHelper.sendEvent(req, '/v1/filter', {
+        type: "$login",
+        status: "$failed",
+        params: {
+          email: req.body.email,
+        },
+      });
+
       const renderLoginWithError = (errorMessage) => renderWithLayout('login', { title: 'Log in', errorMessage });
       return await renderLoginWithError(info.message)(req, res, next);
     }
-    req.logIn(user, (err) => {
+    req.logIn(user, async (err) => {
       if (err) {
+
+        await castleApiHelper.sendEvent(req, '/v1/filter', {
+          type: "$login",
+          status: "$failed",
+          params: {
+            email: req.body.email,
+          },
+        });
+
         return next(err);
       }
+
+      await castleApiHelper.sendEvent(req, '/v1/risk', {
+        type: "$login",
+        status: "$succeeded",
+        user: {
+          id: "887",
+          email: req.body.email,
+        },
+      });
+
       return res.redirect('/dashboard');
     });
   })(req, res, next);
@@ -127,6 +143,15 @@ app.post('/signup', async (req, res) => {
   users.push({
     email: req.body.email,
     password: req.body.password
+  });
+
+  await castleApiHelper.sendEvent(req, '/v1/risk', {
+    type: "$registration",
+    status: "$succeeded",
+    user: {
+      id: "887",
+      email: req.body.email,
+    },
   });
 
   res.redirect('/login');
