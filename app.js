@@ -79,6 +79,10 @@ function renderWithLayout(view, options = {}) {
   };
 }
 
+function renderWithError(view, title, errorMessage) {
+  return renderWithLayout(view, { title, errorMessage });
+}
+
 app.get('/', renderWithLayout('index', { title: 'Welcome' }));
 
 app.get('/login', renderWithLayout('login', { title: 'Log in' }));
@@ -98,8 +102,7 @@ app.post('/login', (req, res, next) => {
         },
       });
 
-      const renderLoginWithError = (errorMessage) => renderWithLayout('login', { title: 'Log in', errorMessage });
-      return await renderLoginWithError(info.message)(req, res, next);
+      return await renderWithError('login', 'Log in', info.message)(req, res, next);
     }
     req.logIn(user, async (err) => {
       if (err) {
@@ -115,7 +118,7 @@ app.post('/login', (req, res, next) => {
         return next(err);
       }
 
-      await castleApiHelper.sendEvent(req, '/v1/risk', {
+      const event = await castleApiHelper.sendEvent(req, '/v1/risk', {
         type: "$login",
         status: "$succeeded",
         user: {
@@ -123,6 +126,11 @@ app.post('/login', (req, res, next) => {
           email: req.body.email,
         },
       });
+      console.log(event)
+
+      if (event.policy.action === 'deny') {
+        return await renderWithError('login', 'Log in', 'Please try again later.')(req, res, next);
+      }
 
       return res.redirect('/dashboard');
     });
@@ -135,23 +143,26 @@ app.get('/signup', renderWithLayout('signup', { title: 'Sign up' }));
 app.post('/signup', async (req, res) => {
   const existingUser = users.find(u => u.email === req.body.email);
 
+  const event = await castleApiHelper.sendEvent(req, '/v1/filter', {
+    type: "$registration",
+    status: "$attempted",
+    user: {
+      id: "887",
+      email: req.body.email,
+    },
+  });
+
+  if (event.policy.action === 'deny') {
+    return await renderWithError('signup', 'Sign up', 'Please try again later.')(req, res);
+  }
+
   if (existingUser) {
-    const renderSignupWithError = (errorMessage) => renderWithLayout('signup', { title: 'Sign up', errorMessage });
-    return await renderSignupWithError('Email is already in use.')(req, res);
+    return await renderWithError('signup', 'Sign up', 'Email is already in use.')(req, res);
   }
 
   users.push({
     email: req.body.email,
     password: req.body.password
-  });
-
-  await castleApiHelper.sendEvent(req, '/v1/risk', {
-    type: "$registration",
-    status: "$succeeded",
-    user: {
-      id: "887",
-      email: req.body.email,
-    },
   });
 
   res.redirect('/login');

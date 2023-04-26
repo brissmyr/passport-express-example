@@ -8,7 +8,7 @@ class CastleApiHelper {
   async sendEvent(req, endpoint, userPayload) {
     const { requestToken, ip, headers } = this._getRequestData(req);
     const payload = this._createPayload(requestToken, ip, headers, userPayload);
-    await this._sendLoginEventToCastle(endpoint, payload);
+    return (await this._sendLoginEventToCastle(endpoint, payload)).data;
   }
 
   _getRequestData(req) {
@@ -37,7 +37,7 @@ class CastleApiHelper {
   }
 
   async _sendLoginEventToCastle(endpoint, payload) {
-    await axios.post('https://api.castle.io' + endpoint,
+    return await axios.post('https://api.castle.io' + endpoint,
       payload, { auth: { password: this.apiSecret, username: '' } }
     )
   }
