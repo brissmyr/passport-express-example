@@ -3,10 +3,6 @@ import * as Castle from '@castleio/castle-js';
 
 const castle = Castle.configure({ pk: window.castlePublishableKey });
 
-castle.createRequestToken().then( (requestToken) => {
-  console.log(requestToken)
-});
-
 // Note: It's recommended that you use the form submit helper if you can
 var myForm = document.getElementsByTagName('form')[0];
 myForm.addEventListener(

@@ -122,11 +122,10 @@ app.post('/login', (req, res, next) => {
         type: "$login",
         status: "$succeeded",
         user: {
-          id: "887",
+          id: req.body.email,
           email: req.body.email,
         },
       });
-      console.log(event)
 
       if (event.policy.action === 'deny') {
         return await renderWithError('login', 'Log in', 'Please try again later.')(req, res, next);
@@ -147,7 +146,7 @@ app.post('/signup', async (req, res) => {
     type: "$registration",
     status: "$attempted",
     user: {
-      id: "887",
+      id: req.body.email,
       email: req.body.email,
     },
   });

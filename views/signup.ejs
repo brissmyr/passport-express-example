@@ -6,12 +6,15 @@
       <h2 class="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">Sign up for an account</h2>
     </div>
 
-    <% if (typeof errorMessage !== 'undefined') { %>
-      <p style="color: red;"><%= errorMessage %></p>
-    <% } %>
-
     <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
       <form class="space-y-6" action="/signup" method="POST">
+
+        <% if (typeof errorMessage !== 'undefined') { %>
+        <div>
+          <span class="block w-full items-center rounded-md bg-red-50 py-2 text-center text-sm text-red-700 ring-1 ring-inset ring-red-600/10"><%= errorMessage %></span>
+        </div>
+        <% } %>
+
         <div>
           <label for="email" class="block text-sm font-medium leading-6 text-gray-900">Email address</label>
           <div class="mt-2">
